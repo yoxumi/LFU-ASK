@@ -40,14 +40,51 @@ Zbudujemy w Javie symulator pamięci podręcznej z algorytmem LFU:
 - na końcu: hit ratio, statystyki, TOP 10 najczęściej używanych stron, testy ręczne
 
   ## PODZIAŁ ZADAŃ – każda osoba ma swoją gałąź i swój plik
-  | Osoba                    | Gałąź                  | Plik, który tworzysz                | Co dokładnie robisz  |
-|--------------------------|--------------------------|-------------------------------------|----------------------|
-| Maria Engel (ja)         | main                     | `Main.java`                         | Uruchomienie, argumenty, scalanie, Word |
-| Alan Gajlewicz           | alan-gajlewicz           | `TraceGenerator.java`               | Generator odwołań z lokalnością 80/20 |
-| Aleh Hrytsyna            | aleh-hrytsyna            | `FrequencyStructures.java`          | HashMap + LinkedList + increaseFreq() |
-| Maksymilian Jabłoński    | maksymilian-jablonski    | `LFUReplacement.java`               | evictLFU() + addNewPage() + hit/miss |
-| Mykhailo Honchar         | mykhailo-honchar         | `ProgressPrinter.java`              | Postęp co 10 000 odwołań + bieżący hit ratio |
-| Oleksandr Fedkiv         | oleksandr-fedkiv         | `Statistics.java`                   | Końcowa tabelka + TOP 10 najczęściej używanych stron |
-| Volodymyr Havenko        | volodymyr-havenko        | `ManualTests.java`                  | 12 testów ręcznych + wyniki krok po kroku
+  Maria Engel (ja) – gałąź main  
+Plik: Main.java  
+→ uruchamiam całą symulację, tworze obiekty (generator, cache, progress, statystyki), pobieram argumenty z linii poleceń, na końcu wywołuje statystyki i testy ręczne + robie sprawozdanie Word.
 
-WSTEPNIE TAK TO WYGLADA POZNIEJ DOPISZE DOKLADNIEJ JAK MOZECIE ZAPISAC KOD JESLI NIE WIECIE POGOLADAJCIE COS NA YT JAKIES PORADNIKI O TYM.
+Alan Gajlewicz – gałąź alan-gajlewicz  
+Plik: TraceGenerator.java  
+→ klasa, która generuje kolejne odwołania do stron z lokalnością 80/20  
+→ musi mieć metodę public int nextPage()  
+→ przykład: 80 % szans na wylosowanie strony 0–9, 20 % szans na 0–49
+
+Aleh Hrytsyna – gałąź aleh-hrytsyna  
+Plik: FrequencyStructures.java  
+→ trzymasz w niej trzy rzeczy:  
+   • Map<Integer, Integer> pageFreq – ile razy użyto danej strony  
+   • Map<Integer, LinkedList<Integer>> freqMap – dla każdej częstotliwości lista stron  
+   • int minFreq – aktualna najmniejsza częstotliwość  
+→ jedna metoda public void increaseFreq(int page) – zwiększa licznik i przenosi stronę na właściwą listę
+
+Maksymilian Jabłoński – gałąź maksymilian-jablonski  
+Plik: LFUReplacement.java  
+→ główna logika cache  
+→ metody:  
+   • boolean contains(int page)  
+   • void access(int page) – sprawdza hit/miss, jak miss i pełny → evictLFU() → addNewPage(page)  
+   • void evictLFU() – usuwa stronę z najmniejszej częstotliwości  
+   • void addNewPage(int page) – dodaje nową stronę z freq = 1
+
+Mykhailo Honchar – gałąź mykhailo-honchar  
+Plik: ProgressPrinter.java  
+→ co 10 000 odwołań wypisuje w konsoli coś w stylu:  
+   Przetworzono: 350000 / 1000000 (35.00%)   Aktualny hit ratio: 93.87%
+
+Oleksandr Fedkiv – gałąź oleksandr-fedkiv  
+Plik: Statistics.java  
+→ na samym końcu programu wypisuje ładną ramkę:  
+   Odwołań: 1 000 000  
+   Hit:     942 130  
+   Miss:     57 870  
+   Hit ratio: 94.21%  
+   + TOP 10 najczęściej używanych stron (np. strona 5 → 87 421 użyć itd.)
+
+Volodymyr Havenko – gałąź volodymyr-havenko  
+Plik: ManualTests.java  
+→ 12 małych, ręcznych testów (sekwencje po 10–20 odwołań)  
+→ dla każdej sekwencji wypisuje krok po kroku co się dzieje, co wyrzuciło i ile było miss  
+→ przykład: sekwencja 0,1,2,3,0,4,0,1 → 6 miss, wyrzuciło stronę 2 itd.
+
+WSTEPNIE TAK TO WYGLADA POZNIEJ DOPISZE DOKLADNIEJ JAK MOZECIE ZAPISAC KOD JESLI NIE WIECIE, ALBO JESLI KTOS MA SWOJ POMYSL I COS CHCE ZMIENIC I PRZEGADAC TO PISZCIE + JESLI KOD NIE BEDZIE SPOJNY Z CZYIMS KAWALKIEM KODU Z PRZYDZIELONEGO ZADANIA NAJWYZEJ ZROBIMY POPRAWKI MALE I OPRACUJEMY RAZEM ;))
